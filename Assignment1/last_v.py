@@ -38,11 +38,10 @@ class Reverter:
         """Compute a hashcode of the array. Since it is not possible to hash a list, this one is first
         converted to a tuple
         """
-        self.__hash__=hash(tuple(self.table)) # on est obliger de changer self.table de type list to tuple car list est changable est on ne peut pas fait le hashage a un objet chanchable
-    
+        self.__hash__=hash(tuple(self.table)) 
+
     def __eq__(self, __value: Reverter) -> bool:
         """Tests whether the current object if equals to another object (Reverter). The comparison is made by comparing the hashcodes
-
         Args:
             __value (Reverter): _description_
 
@@ -51,7 +50,6 @@ class Reverter:
         """
         return self.__hash__==__value.__hash__
     
-    
     def is_the_goal(self) -> bool :
         """Tests whether the table is already sorted (so that the search is stopped)
 
@@ -59,9 +57,8 @@ class Reverter:
             bool: True if the table is sorted, else it is False.
         """
         for i in range(1,len(self.table)):
-            if self.table[i-1]>self.table[i]:return False #ascending
+            if self.table[i-1]>self.table[i]:return False 
         return True
-    
     
     def clone(self) -> Reverter:
         """This methods create a copy of the current object
@@ -69,9 +66,9 @@ class Reverter:
         Returns:
             Reverter: the copy to be created
         """
-        res=Reverter(len(self.table),False) # new object created with the same size and empty 
-        res.table=[*self.table] #set the same values in the new separate table
-        res.parent=self #precise the original table
+        res=Reverter(len(self.table),False) 
+        res.table=[*self.table] 
+        res.parent=self 
         return res
     
     def actions(self) -> list[Reverter]:
@@ -85,9 +82,9 @@ class Reverter:
         sz=len(self.table)
         for i in range(sz):
             r=self.clone()
-            v=self.table[i:] #on prend une sous list man i 7atan fin 
-            v.reverse() # reverse juste la sous list
-            r.table=self.table[:i]+v # n7oto fal r la 1er sous list e original kimarahi + la dernier sous list li reversinaha 
+            v=self.table[i:] 
+            v.reverse() 
+            r.table=self.table[:i]+v 
             r.hash()
             res.append(r)
         return res
@@ -99,75 +96,51 @@ class Reverter:
             Optional[Reverter]: the sorted table is possible
         """
 
-        # Check if the table is already sorted
         if self.is_the_goal():
             return self
 
-        # Set of visited states to avoid revisiting
         visited = set()
-        
-        # Add the initial state to visited
         visited.add(self.__hash__)
-
-        # Explore states using breadth-first search
-        row = [self]  # Start with the initial state
+        row = [self] 
 
         while row:
-            current_state = row.pop(0)  # Get the next state from the row
-
-            # Generate possible actions (reverting)
+            current_state = row.pop(0)  
             possible_actions = current_state.actions()
 
-            # Check each possible action
             for action in possible_actions:
-                # Check if the action has been visited before
                 if action.__hash__ not in visited:
                     visited.add(action.__hash__)
 
-                # Check if the action leads to the goal state
                 if action.is_the_goal():
-                    return action  # Return the sorted table
+                    return action  
 
-                # Add the action to the row for further exploration
                 row.append(action)
-
-        # If no sorted state is found, return None
         return None 
+    
     def solveDepth(self) -> Optional[Reverter]:
         """This method implements depth first search
 
         Returns:
             Optional[Reverter]: the sorted table is possible
         """
-        # Check if the table is already sorted
         if self.is_the_goal():
             return self
 
-        # Set of visited states to avoid revisiting
         stack = [self]
-    
-    # Ensemble pour suivre les états déjà visités
         visited = set()
-    
-    # Boucle principale de la recherche en profondeur
         while stack:
-        # Prend le dernier état de la pile
             current_state = stack.pop()
         
-        # Vérifie si l'état actuel est le but recherché
             if current_state.is_the_goal():
                return current_state
         
             if action.__hash__ not in visited:
                 visited.add(action.__hash__)
         
-        # Génère les actions possibles et les ajoute à la pile
             possible_actions = current_state.actions()
 
             for action in possible_actions:
                 stack.append(action)
-
-    # Retourne None si aucune solution n'est trouvée
         return None
     
     def solveRandom(self) -> Optional[Reverter]:
@@ -176,14 +149,10 @@ class Reverter:
         Returns:
             Optional[Reverter]: the sorted table is possible
         """
-        # Check if the table is already sorted
         if self.is_the_goal():
             return self
 
-        # Set of visited states to avoid revisiting
         visited = set()
-        
-        # Add the initial state to visited
         visited.add(self.__hash__)
 
         while True:
@@ -192,11 +161,8 @@ class Reverter:
             if action.__hash__ not in visited:
                 visited.add(action.__hash__)
 
-                # Check if the action leads to the goal state
                 if action.is_the_goal():
-                    return action  # Return the sorted table
-
-        # If no sorted state is found, return None
+                    return action 
         return None
         
     def solveHeuristic1(self) -> Optional[Reverter]:
@@ -206,12 +172,9 @@ class Reverter:
             Optional[Reverter]: the sorted table is possible
         """
         if self.is_the_goal():
-            return self  # If the current state is already sorted, return it
+            return self  
 
-        visited = set()  # Keep track of visited states
-
-        # Heuristic function: sum of elements greater than current element on the left
-        # and elements less than current element on the right
+        visited = set()  
         def heuristic(state: Reverter) -> int:
             total_cost = 0
             for i in range(len(state.table)):
@@ -228,32 +191,22 @@ class Reverter:
                 total_cost += left_count + right_count
             return total_cost
 
-        # Explore states using heuristic search
-        priority_queue = [(heuristic(self), self)]  # Start with the initial state, priority based on heuristic value
+        priority_queue = [(heuristic(self), self)]  
 
         while priority_queue:
-            _, current_state = priority_queue.pop(0)  # Get the next state with the lowest heuristic value
-
-            # Generate possible actions (reverting)
+            _, current_state = priority_queue.pop(0)  
             possible_actions = current_state.actions()
 
-            # Check each possible action
             for action in possible_actions:
-                # Check if the action leads to a new state
                 if action.__hash__ not in visited:
-                    visited.add(action.__hash__)  # Mark the action as visited
+                    visited.add(action.__hash__)  
 
-                    # If the action leads to a sorted state, return it
                     if action.is_the_goal():
                         return action
 
-                    # Add the action to the priority queue with priority based on heuristic value
                     priority_queue.append((heuristic(action), action))
 
-            # Sort the priority queue based on heuristic values
             priority_queue.sort(key=lambda x: x[0])
-
-        # If no sorted state is found after exploring all possibilities, return None
         return None
     
     def solveHeuristic2(self) -> Optional[Reverter]:
@@ -268,8 +221,6 @@ class Reverter:
 
         visited = set()  
 
-        # Heuristic function: sum of elements greater than current element on the left
-        # and elements less than current element on the right
         def heuristic(state: Reverter) -> int:
             total_cost = 0
             for i in range(len(state.table)):
@@ -287,40 +238,29 @@ class Reverter:
             return total_cost
         
         def depth(state: Reverter) -> int:
-            # Start with depth 0 for the initial state
+
             depth_value = 0
-            # Traverse the parent pointers to calculate the depth
             while state.parent is not None:
                 depth_value += 1
                 state = state.parent
             return depth_value
 
-        # Explore states using A* search
-        priority_queue = [(depth(self), heuristic(self), self)]  # Start with the initial state, priority based on profit and heuristic value
+        priority_queue = [(depth(self), heuristic(self), self)]  
 
         while priority_queue:
-            _, _, current_state = priority_queue.pop(0)  # Get the next state with the lowest profit and heuristic value
-
-            # Generate possible actions (reverting)
+            _, _, current_state = priority_queue.pop(0)  
             possible_actions = current_state.actions()
 
-            # Check each possible action
             for action in possible_actions:
-                # Check if the action leads to a new state
                 if action.__hash__ not in visited:
-                    visited.add(action.__hash__)  # Mark the action as visited
+                    visited.add(action.__hash__)  
 
-                    # If the action leads to a sorted state, return it
                     if action.is_the_goal():
                         return action
 
-                    # Add the action to the priority queue with priority based on profit and heuristic value
                     priority_queue.append((depth(self), heuristic(action), action))
 
-            # Sort the priority queue based on profit and heuristic values
             priority_queue.sort(key=lambda x: (x[0], x[1]))
-
-        # If no sorted state is found after exploring all possibilities, return None
         return None    
     def solveHeuristic3(self) -> Optional[Reverter]:
         """This method implements heuristic search (your proposed heuristic)
@@ -329,12 +269,9 @@ class Reverter:
             Optional[Reverter]: the sorted table is possible
         """
         if self.is_the_goal():
-           return self  # Si l'état initial est déjà le but recherché, retournez-le
+           return self  
        
         visited = set()  
-
-        # Heuristic function: sum of elements greater than current element on the left
-        # and elements less than current element on the right
         def heuristic(state: Reverter) -> int:
             total_cost = 0
             for i in range(len(state.table)):
@@ -352,41 +289,28 @@ class Reverter:
             return total_cost
         
         def depth(state: Reverter) -> int:
-            # Start with depth 0 for the initial state
+            
             depth_value = 0
-            # Traverse the parent pointers to calculate the depth
             while state.parent is not None:
                 depth_value += 1
                 state = state.parent
             return depth_value
 
-        # Explore states using A* search
-        priority_queue = [(depth(self), heuristic(self), self)]  # Start with the initial state, priority based on profit and heuristic value
-
+        priority_queue = [(depth(self), heuristic(self), self)]  
         while priority_queue:
-            _, _, current_state = priority_queue.pop()  # Get the next state with the lowest profit and heuristic value
- 
- 
-            # Generate possible actions (reverting)
+            _, _, current_state = priority_queue.pop()  
             possible_actions = current_state.actions()
 
-            # Check each possible action
             for action in possible_actions:
-                # Check if the action leads to a new state
                 if action.__hash__ not in visited:
-                    visited.add(action.__hash__)  # Mark the action as visited
+                    visited.add(action.__hash__)  
 
-                    # If the action leads to a sorted state, return it
                     if action.is_the_goal():
                         return action
 
-                    # Add the action to the priority queue with priority based on profit and heuristic value
                     priority_queue.append((depth(self), heuristic(action), action))
 
-            # Sort the priority queue based on profit and heuristic values
             priority_queue.sort(key=lambda x: (x[0], x[1]))
-
-        # If no sorted state is found after exploring all possibilities, return None
         return None    
     
      
