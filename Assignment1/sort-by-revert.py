@@ -142,16 +142,41 @@ class Reverter:
         Returns:
             Optional[Reverter]: the sorted table is possible
         """
+
         # Check if the table is already sorted
         if self.is_the_goal():
             return self
 
-        # Set of visited states to avoid revisiting
-        visited = set()
-
         
-        raise NotImplementedError("This method is not yet implemented")
+        stack = [self]
     
+    # Ensemble pour suivre les états déjà visités
+        visited = set()
+    
+    # Boucle principale de la recherche en profondeur
+        while stack:
+        # Prend le dernier état de la pile
+            current_state = stack.pop()
+        
+        # Vérifie si l'état actuel est le but recherché
+            if current_state.is_the_goal():
+               return current_state
+        
+        # Ignore si l'état actuel a déjà été visité
+            if current_state.hash_value in visited:
+               continue
+        
+        # Marque l'état actuel comme visité
+            visited.add(current_state.hash_value)
+        
+        # Génère les actions possibles et les ajoute à la pile
+            possible_actions = current_state.actions()
+            for action in possible_actions:
+               stack.append(action)
+    
+    # Retourne None si aucune solution n'est trouvée
+        return None
+        
     def solveRandom(self) -> Optional[Reverter]:
         """This method implements random search
 
