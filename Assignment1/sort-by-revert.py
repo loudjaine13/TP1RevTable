@@ -31,14 +31,14 @@ class Reverter:
         Returns:
             str: the string representation
         """
-        return str(self.table) #translate the table to str
+        return str(self.table)
 
     
     def hash(self):
         """Compute a hashcode of the array. Since it is not possible to hash a list, this one is first
         converted to a tuple
         """
-        self.hash_value=hash(tuple(self.table))
+        self.__hash__=hash(tuple(self.table)) # on est obliger de changer self.table de type list to tuple car list est changable est on ne peut pas fait le hashage a un objet chanchable
     
     def __eq__(self, __value: Reverter) -> bool:
         """Tests whether the current object if equals to another object (Reverter). The comparison is made by comparing the hashcodes
@@ -49,7 +49,7 @@ class Reverter:
         Returns:
             bool: True if self==__value, else it is False
         """
-        return self.hash_value==__value.hash_value
+        return self.__hash__==__value.__hash__
     
     
     def is_the_goal(self) -> bool :
@@ -85,9 +85,9 @@ class Reverter:
         sz=len(self.table)
         for i in range(sz):
             r=self.clone()
-            v=self.table[i:]
-            v.reverse()
-            r.table=self.table[:i]+v
+            v=self.table[i:] #on prend une sous list man i 7atan fin 
+            v.reverse() # reverse juste la sous list
+            r.table=self.table[:i]+v # n7oto fal r la 1er sous list e original kimarahi + la dernier sous list li reversinaha 
             r.hash()
             res.append(r)
         return res
@@ -107,7 +107,7 @@ class Reverter:
         visited = set()
         
         # Add the initial state to visited
-        visited.add(self.hash_value)
+        visited.add(self.__hash__)
 
         # Explore states using breadth-first search
         row = [self]  # Start with the initial state
@@ -121,11 +121,8 @@ class Reverter:
             # Check each possible action
             for action in possible_actions:
                 # Check if the action has been visited before
-                if action.hash_value in visited:
-                    continue
-
-                # Mark the action as visited
-                visited.add(action.hash_value)
+                if action.__hash__ not in visited:
+                    visited.add(action.__hash__)
 
                 # Check if the action leads to the goal state
                 if action.is_the_goal():
@@ -142,12 +139,11 @@ class Reverter:
         Returns:
             Optional[Reverter]: the sorted table is possible
         """
-
         # Check if the table is already sorted
         if self.is_the_goal():
             return self
 
-        
+        # Set of visited states to avoid revisiting
         stack = [self]
     
     # Ensemble pour suivre les états déjà visités
@@ -162,29 +158,47 @@ class Reverter:
             if current_state.is_the_goal():
                return current_state
         
-        # Ignore si l'état actuel a déjà été visité
-            if current_state.hash_value in visited:
-               continue
-        
-        # Marque l'état actuel comme visité
-            visited.add(current_state.hash_value)
+            if action.__hash__ not in visited:
+                visited.add(action.__hash__)
         
         # Génère les actions possibles et les ajoute à la pile
             possible_actions = current_state.actions()
+
             for action in possible_actions:
-               stack.append(action)
-    
+                stack.append(action)
+
     # Retourne None si aucune solution n'est trouvée
         return None
-        
+    
     def solveRandom(self) -> Optional[Reverter]:
         """This method implements random search
 
         Returns:
             Optional[Reverter]: the sorted table is possible
         """
-        raise NotImplementedError("This method is not yet implemented")
-    
+        # Check if the table is already sorted
+        if self.is_the_goal():
+            return self
+
+        # Set of visited states to avoid revisiting
+        visited = set()
+        
+        # Add the initial state to visited
+        visited.add(self.__hash__)
+
+        while True:
+            action = random.choice(self.actions())
+
+            if action.__hash__ not in visited:
+                visited.add(action.__hash__)
+
+                # Check if the action leads to the goal state
+                if action.is_the_goal():
+                    return action  # Return the sorted table
+
+        # If no sorted state is found, return None
+        return None
+        
     def solveHeuristic1(self) -> Optional[Reverter]:
         """This method implements heuristic search (heuristic n° 1)
 
@@ -210,8 +224,8 @@ class Reverter:
         raise NotImplementedError("This method is not yet implemented")
     
      
-size=7#8,...,15,...
+size=3#8,...,15,...
 rev=Reverter(size,True)
-r=rev.solveBreadth()
+r=rev.solveRandom()
 print("Original Table:", rev)
 print("Sorted Table:",r)
